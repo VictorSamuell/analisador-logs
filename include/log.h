@@ -12,6 +12,7 @@ typedef struct {
 } Registro;
 typedef struct { Registro *itens; size_t total; size_t invalidos; } Log;
 int timestamp_parse(const char *texto, uint64_t *valor);
+/* Retorna texto vazio se o valor exceder os 14 digitos do formato. */
 void timestamp_format(uint64_t valor, char texto[20]);
 int registro_parse(char *linha, Registro *registro);
 /* 1: linha completa, 0: EOF, -1: linha longa, -2: erro de leitura. */

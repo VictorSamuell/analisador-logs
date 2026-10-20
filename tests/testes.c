@@ -16,6 +16,10 @@ static void contem(FILE *f,const char *esperado) {
 int main(void) {
     Log log={0}; Indice idx={0}; uint64_t t; size_t n,i; FILE *f,*saida;
     char s[20];
+    timestamp_format(data("0001-01-01 00:00:00"),s); assert(strcmp(s,"0001-01-01 00:00:00")==0);
+    timestamp_format(data("9999-12-31 23:59:59"),s); assert(strcmp(s,"9999-12-31 23:59:59")==0);
+    timestamp_format(UINT64_C(100000000000000),s); assert(s[0]=='\0');
+    timestamp_format(UINT64_MAX,s); assert(s[0]=='\0');
     assert(timestamp_parse("2024-02-29 23:59:59",&t)); timestamp_format(t,s); assert(strcmp(s,"2024-02-29 23:59:59")==0);
     assert(!timestamp_parse("2026-02-29 12:00:00",&t)); assert(!timestamp_parse("1900-02-29 12:00:00",&t));
     assert(timestamp_parse("2000-02-29 12:00:00",&t)); assert(!timestamp_parse("2026-04-31 12:00:00",&t));

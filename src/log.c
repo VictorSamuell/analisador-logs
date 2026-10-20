@@ -24,8 +24,10 @@ int timestamp_parse(const char *s, uint64_t *valor) {
 }
 void timestamp_format(uint64_t n, char s[20]) {
     unsigned seg=(unsigned)(n%100), min, hora, dia, mes, ano;
+    /* Nao permite que um ano com mais de quatro digitos seja truncado. */
+    if (n > UINT64_C(99999999999999)) { s[0]='\0'; return; }
     n/=100; min=(unsigned)(n%100); n/=100; hora=(unsigned)(n%100);
-    n/=100; dia=(unsigned)(n%100); n/=100; mes=(unsigned)(n%100); ano=(unsigned)(n/100);
+    n/=100; dia=(unsigned)(n%100); n/=100; mes=(unsigned)(n%100); ano=(unsigned)((n/100)%10000);
     (void)snprintf(s,20,"%04u-%02u-%02u %02u:%02u:%02u",ano,mes,dia,hora,min,seg);
 }
 int linha_ler(FILE *f, char *s, size_t cap) {
