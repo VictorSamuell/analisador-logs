@@ -112,19 +112,4 @@ Ao abrir o índice pela primeira vez na sessão, o programa confere formato, tam
 - O hash detecta alterações acidentais; não é uma assinatura criptográfica. O log original é necessário para consultar o índice.
 - A opção 1 sobrescreve o índice associado e a opção 6 sobrescreve o relatório associado. A pasta de origem precisa permitir escrita. Se uma gravação falhar, reconstrua o arquivo gerado; a gravação não é transacional.
 
-## Testes e publicação posterior
 
-`make test` ou `build.bat` cobre datas, anos bissextos, CRLF, última linha sem quebra, linhas inválidas/longas, arquivo vazio/ausente, estabilidade do mergesort, contagens, intervalos inclusivos, persistência, índice corrompido/truncado e origem alterada.
-
-O roteiro do menu também foi exercitado em duas execuções separadas no Windows. Não foi executado Valgrind neste ambiente; a verificação de memória em laboratório prevista na proposta ainda pode ser feita, por exemplo com `valgrind --leak-check=full ./build/testes` no Linux.
-
-O repositório local usa a branch `main`. O `.gitignore` exclui executáveis, arquivos de compilação, índices e relatórios gerados. O GitHub Actions está configurado para compilar e executar os testes no Linux a cada push ou pull request; a execução remota será verificada após a publicação.
-
-Para conectar a um repositório vazio que você criou no GitHub, execute dentro desta pasta, substituindo `SEU_USUARIO` e o nome do repositório:
-
-```sh
-git remote add origin https://github.com/SEU_USUARIO/analisador-logs-t7.git
-git push -u origin main
-```
-
-Esta preparação não cria repositório remoto nem faz push. Antes da apresentação, preencha os integrantes e a divisão de responsabilidades em `docs/ESCOPO.md` e ensaie a explicação de cada módulo.
