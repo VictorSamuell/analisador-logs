@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T7 — Arquitetura do analisador de logs</title>
+<style>
+@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font:16px/1.45 system-ui,sans-serif;color:#172b40;background:#e9eef3;margin:0;padding:28px}.page{max-width:1100px;margin:auto;background:white;padding:36px}h1{font-size:36px;line-height:1.1;margin:8px 0 14px}h2{font-size:20px;margin:0 0 10px}p{margin:8px 0}.tag{font-weight:700;color:#146b75;letter-spacing:2px}.flow{display:flex;align-items:stretch;gap:12px;margin:26px 0}.box{background:#edf5f7;border-top:4px solid #146b75;padding:16px;flex:1}.arrow{align-self:center;font-size:26px;color:#146b75}.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}.line{border-top:1px solid #b9c9d4;padding-top:18px}code{font-family:Consolas,monospace;font-size:14px}table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;padding:7px;border-bottom:1px solid #ced9e0}footer{margin-top:24px;font-size:13px;color:#485e70}@media print{body{background:white;padding:0;font-size:12px}.page{padding:0;max-width:none}h1{font-size:28px}h2{font-size:17px}.flow{margin:18px 0}.box{padding:12px}code,table{font-size:11px}footer{font-size:11px}.grid{gap:20px}}@media(max-width:700px){.grid{grid-template-columns:1fr}.flow{flex-direction:column}.arrow{transform:rotate(90deg)}}
+</style>
+<main class="page">
+<div class="tag">PROJETO INTEGRADOR • T7 • C11</div>
+<h1>Analisador de arquivos de log</h1>
+<p>Do texto original às estatísticas e consultas por intervalo de tempo.</p>
+<div class="flow">
+ <div class="box"><h2>1 · Ler</h2><b>log.h / log.c</b><p>Validar linhas e datas.<br>Montar vetor de <code>Registro</code>.<br>Guardar offsets da origem.</p></div>
+ <div class="arrow">→</div>
+ <div class="box"><h2>2 · Ordenar</h2><b>ordenacao.h / .c</b><p>Mergesort recursivo.<br>Ordem cronológica estável.<br>Tempo O(n log n).</p></div>
+ <div class="arrow">→</div>
+ <div class="box"><h2>3 · Analisar e salvar</h2><b>relatorio.h / .c · indice.h / .c</b><p>Contagens e ranking.<br>Relatório em texto.<br>Índice binário compacto.</p></div>
+</div>
+<div class="grid">
+<section class="line"><h2>Menu e fluxo de dados</h2><p><b>main.c</b> controla as operações e mantém os objetos locais. Os módulos se comunicam por parâmetros e retornos; não há variáveis globais.</p><p><code>Texto → vetor → mergesort → relatório + índice</code></p><p><code>Índice reaberto → busca binária → offset → linha</code></p><p>Após validação inicial, a consulta custa <b>O(log n + k)</b>, para k resultados. Os limites são inclusivos.</p></section>
+<section class="line"><h2>Persistência e acesso direto</h2><table><tr><th>Posição</th><th>Conteúdo</th></tr><tr><td>0–31</td><td>Versão, quantidade, tamanho e hash da origem</td></tr><tr><td>32 + 16 × i</td><td>Timestamp (8 bytes) + offset (8 bytes)</td></tr></table><p>Inteiros little-endian. Total: <b>32 + 16 × n bytes</b>.</p><p><code>fseek(indice, 32 + 16 * i, SEEK_SET)</code><br>O evento permanece no arquivo-texto original.</p></section>
+<section class="line"><h2>Por que recursão?</h2><p>Dividir o vetor ao meio, ordenar as duas metades e intercalar. Caso base: zero ou um registro. A estrutura das chamadas acompanha a divisão do problema.</p><p>Vetor auxiliar O(n) · pilha O(log n). Em empates, a metade esquerda vem primeiro.</p></section>
+<section class="line"><h2>Demonstração e robustez</h2><p>Exemplo: <b>8 registros · INFO 4 · ERROR 2 · WARN 2</b>.<br>Evento líder: Login realizado, 3 ocorrências.<br>Consulta exata às 09:30:00: 2 registros.</p><p>Datas e linhas inválidas são tratadas. Índice incompatível é recusado. Após alterar o log, reconstrua o índice; mantenha a origem intacta durante a sessão.</p></section>
+</div>
+<footer>Integrantes e RAs: preencher pelo grupo • Abra este arquivo no navegador e imprima em A4 paisagem.</footer>
+</main></html>

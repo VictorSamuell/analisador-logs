@@ -1,0 +1,8 @@
+build/
+*.idx
+*.relatorio.txt
+*.obj
+*.exe
+*.pdb
+*.ilk
+.vs/
