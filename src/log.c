@@ -1,4 +1,4 @@
-#include "log.h"
+#include "log.h" // Traz as structs Registro e Log, a macro LINE_CAP e os protótipos (inclui <stdio.h>, <stdint.h>, <stddef.h>)
 #include <stdlib.h>
 #include <string.h>
 

@@ -1,6 +1,8 @@
 #include "ordenacao.h"
 #include <stdlib.h>
 #include <string.h>
+// mergesort O(n log n)
+
 static void ordenar(Registro *v, Registro *aux, size_t inicio, size_t fim) {
     size_t meio, i, j, k;
     if (fim-inicio<2) return;

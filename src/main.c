@@ -1,15 +1,17 @@
-#include "log.h"
-#include "ordenacao.h"
-#include "relatorio.h"
-#include "indice.h"
+#include "log.h" // Traz struct Log, struct Registro, linha_ler(), timestamp_parse(), log_carregar(), etc. (inclui <stdio.h> e <stdint.h> por tabela)
+#include "ordenacao.h" // mergesort do mergesort_registros()
+#include "relatorio.h"// Traz relatorio_gerar() e relatorio_salvar()
+#include "indice.h" // Traz struct Indice, indice_criar(), indice_abrir(), indice_consultar(), indice_fechar()
 #include <stdlib.h>
 #include <string.h>
 
+/* Função para garantir que uma linha digitada pelo usuário no teclado (stdin) será lida corretamente e com segurança */
 static int perguntar(const char *rotulo,char *valor,size_t cap) {
     int status; printf("%s",rotulo); fflush(stdout); status=linha_ler(stdin,valor,cap);
     if(status<0) puts("Entrada invalida ou longa demais.");
     return status;
 }
+/* Pede duas datas ao usuário, valida se existem no calendário e se Inicio <= Fim */
 static int intervalo(uint64_t *inicio,uint64_t *fim) {
     char a[64],b[64];
     if(perguntar("Inicio (AAAA-MM-DD HH:MM:SS): ",a,sizeof a)!=1 ||
@@ -19,6 +21,7 @@ static int intervalo(uint64_t *inicio,uint64_t *fim) {
     }
     return 1;
 }
+/* Carrega o arquivo .log para a RAM e já ordena tudo com Mergesort */
 static int carregar(const char *path,Log *log) {
     Log novo={0};
     if(!log_carregar(path,&novo) || !mergesort_registros(novo.itens,novo.total)) {
@@ -27,6 +30,8 @@ static int carregar(const char *path,Log *log) {
     log_liberar(log); *log=novo;
     printf("Carregados: %zu | Invalidos ignorados: %zu\n",log->total,log->invalidos); return 1;
 }
+
+
 int main(int argc,char **argv) {
     Log log={0}; Indice idx={0}; char origem[512]="",binario[520],relatorio[528],op[32]; int carregado=0,status;
     if(argc>2) { puts("Uso: analisador [arquivo.log]"); return EXIT_FAILURE; }
