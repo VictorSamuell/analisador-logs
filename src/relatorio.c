@@ -2,26 +2,31 @@
 #include <stdlib.h>
 #include <string.h>
 typedef struct { const char *nome; size_t quantidade; } Contagem;
+/* Soma uma ocorrência ou cria a contagem do nome pela primeira vez. */
 static void contar(Contagem *v, size_t *n, const char *nome) {
     size_t i;
     for(i=0;i<*n;++i) if(strcmp(v[i].nome,nome)==0) { ++v[i].quantidade; return; }
     v[*n].nome=nome; v[*n].quantidade=1; ++*n;
 }
 static int por_nome(const void *a,const void *b) {
+    /* Ordena categorias em ordem alfabética. */
     return strcmp(((const Contagem *)a)->nome,((const Contagem *)b)->nome);
 }
 static int por_ranking(const void *a,const void *b) {
+    /* Coloca eventos mais frequentes primeiro e desempata pelo nome. */
     const Contagem *x=a,*y=b;
     if(x->quantidade!=y->quantidade) return x->quantidade>y->quantidade ? -1:1;
     return strcmp(x->nome,y->nome);
 }
 int relatorio_gerar(FILE *f,const Log *log,uint64_t inicio,uint64_t fim) {
+    /* Conta registros do intervalo e imprime estatísticas e ranking. */
     Contagem *cats=NULL,*eventos=NULL; size_t nc=0,ne=0,i,total=0,horas[24]={0};
     if(inicio>fim || log->total>SIZE_MAX/sizeof *cats) return 0;
     if(log->total) {
         cats=calloc(log->total,sizeof *cats); eventos=calloc(log->total,sizeof *eventos);
         if(!cats || !eventos) { free(cats); free(eventos); return 0; }
     }
+    /* Ignora registros fora do intervalo e atualiza as contagens. */
     for(i=0;i<log->total;++i) {
         const Registro *r=&log->itens[i];
         if(r->timestamp<inicio || r->timestamp>fim) continue;
@@ -39,6 +44,7 @@ int relatorio_gerar(FILE *f,const Log *log,uint64_t inicio,uint64_t fim) {
     free(cats); free(eventos); return !ferror(f);
 }
 int relatorio_salvar(const char *path,const Log *log) {
+    /* Gera o relatório completo em um arquivo de texto. */
     FILE *f=fopen(path,"w"); int ok;
     if(!f) return 0;
     ok=relatorio_gerar(f,log,0,UINT64_MAX);
